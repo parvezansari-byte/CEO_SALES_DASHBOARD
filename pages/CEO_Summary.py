@@ -136,37 +136,46 @@ with col4:
     """,unsafe_allow_html=True)
 
 
-# ---------------------------------------------------
+# =====================================================
 # BUSINESS HEALTH SCORE
-# ---------------------------------------------------
-st.markdown(f"""
-<div style="
-background:linear-gradient(90deg,#065f46,#22c55e);
-padding:25px;
-border-radius:25px;
-box-shadow:0px 10px 25px rgba(0,255,120,.25);
-margin-top:15px;
-">
-<h3 style='color:white'>🏆 Business Health Score</h3>
-<h1 style='color:white'>{health_score:.1f}/100</h1>
-<h4 style='color:#dcfce7'>Moderate Growth</h4>
-</div>
-""",unsafe_allow_html=True)
+# =====================================================
 
+health_score = (
+    (total_aum / target_aum) * 40
+    + (sip_book / target_sip) * 20
+    + (clients / target_clients) * 20
+    + (partners / target_partners) * 20
+)
 
 health_score = min(100, health_score)
 
-st.subheader("Business Health Score")
+status = "Moderate Growth"
 
 if health_score >= 85:
-    st.success(f"🟢 Excellent : {health_score:.1f}/100")
-elif health_score >= 70:
-    st.warning(f"🟡 Moderate : {health_score:.1f}/100")
-else:
-    st.error(f"🔴 Attention Required : {health_score:.1f}/100")
+    status = "Excellent Growth"
+elif health_score < 70:
+    status = "Needs Attention"
 
-st.progress(health_score / 100)
+st.markdown(
+f"""
+<div style="
+background:linear-gradient(135deg,#065f46,#16a34a);
+padding:30px;
+border-radius:25px;
+box-shadow:0px 10px 30px rgba(0,255,120,.25);
+margin-top:20px;
+">
 
+<h3 style='color:white;'>🏆 Business Health Score</h3>
+
+<h1 style='color:white;'>{health_score:.1f}/100</h1>
+
+<h4 style='color:#dcfce7'>{status}</h4>
+
+</div>
+""",
+unsafe_allow_html=True
+)
 # ---------------------------------------------------
 # TARGET STATUS
 # ---------------------------------------------------
