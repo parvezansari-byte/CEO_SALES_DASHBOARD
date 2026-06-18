@@ -1,15 +1,20 @@
 import streamlit as st
 import pandas as pd
-import plotly.express as px
+from pathlib import Path
 
-st.set_page_config(layout="wide")
-
-# --------------------------------
+# ----------------------------------------
 # LOAD DATA
-# --------------------------------
+# ----------------------------------------
 @st.cache_data
 def load_data():
-    return pd.read_excel("sales_analysis_report.xlsx")
+
+    # Root folder of project
+    BASE_DIR = Path(__file__).resolve().parent.parent
+
+    # Excel file path
+    EXCEL_FILE = BASE_DIR / "sales_analysis_report.xlsx"
+
+    return pd.read_excel(EXCEL_FILE)
 
 df = load_data()
 
