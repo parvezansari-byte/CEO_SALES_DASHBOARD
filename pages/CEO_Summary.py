@@ -48,27 +48,114 @@ target_sip = 2
 target_clients = 3500
 target_partners = 120
 
-# ---------------------------------------------------
-# KPI CARDS
-# ---------------------------------------------------
-c1, c2, c3, c4 = st.columns(4)
+```python
+# =====================================================
+# PREMIUM CEO KPI CARDS
+# =====================================================
 
-c1.metric("AUM", f"₹{total_aum:.2f} Cr")
-c2.metric("SIP Book", f"₹{sip_book:.2f} Cr")
-c3.metric("Clients", clients)
-c4.metric("Partners", partners)
+st.markdown("""
+<style>
 
-st.divider()
+.card{
+background:linear-gradient(135deg,#111827,#1e293b);
+padding:25px;
+border-radius:25px;
+box-shadow:0px 10px 25px rgba(0,0,0,.45);
+border:1px solid rgba(255,255,255,.08);
+transition:0.3s;
+}
+
+.card:hover{
+transform:translateY(-5px);
+box-shadow:0px 15px 35px rgba(0,255,150,.25);
+}
+
+.card-title{
+font-size:15px;
+color:#94a3b8;
+font-weight:600;
+}
+
+.card-value{
+font-size:42px;
+font-weight:800;
+color:white;
+}
+
+.green{
+background:linear-gradient(135deg,#00C853,#009624);
+}
+
+.blue{
+background:linear-gradient(135deg,#2563eb,#1d4ed8);
+}
+
+.orange{
+background:linear-gradient(135deg,#f59e0b,#d97706);
+}
+
+.purple{
+background:linear-gradient(135deg,#7c3aed,#6d28d9);
+}
+
+</style>
+""",unsafe_allow_html=True)
+
+col1,col2,col3,col4 = st.columns(4)
+
+with col1:
+    st.markdown(f"""
+    <div class="card green">
+    <div class="card-title">💰 Total AUM</div>
+    <div class="card-value">₹{total_aum:.2f} Cr</div>
+    </div>
+    """,unsafe_allow_html=True)
+
+with col2:
+    st.markdown(f"""
+    <div class="card blue">
+    <div class="card-title">📈 SIP Book</div>
+    <div class="card-value">₹{sip_book:.2f} Cr</div>
+    </div>
+    """,unsafe_allow_html=True)
+
+with col3:
+    st.markdown(f"""
+    <div class="card orange">
+    <div class="card-title">👥 Clients</div>
+    <div class="card-value">{clients}</div>
+    </div>
+    """,unsafe_allow_html=True)
+
+with col4:
+    st.markdown(f"""
+    <div class="card purple">
+    <div class="card-title">🤝 Partners</div>
+    <div class="card-value">{partners}</div>
+    </div>
+    """,unsafe_allow_html=True)
+```
+
 
 # ---------------------------------------------------
 # BUSINESS HEALTH SCORE
 # ---------------------------------------------------
-health_score = (
-    (total_aum / target_aum) * 40
-    + (sip_book / target_sip) * 20
-    + (clients / target_clients) * 20
-    + (partners / target_partners) * 20
-)
+```python
+st.markdown(f"""
+<div style="
+background:linear-gradient(90deg,#065f46,#22c55e);
+padding:25px;
+border-radius:25px;
+box-shadow:0px 10px 25px rgba(0,255,120,.25);
+margin-top:15px;
+">
+<h3 style='color:white'>🏆 Business Health Score</h3>
+<h1 style='color:white'>{health_score:.1f}/100</h1>
+<h4 style='color:#dcfce7'>Moderate Growth</h4>
+</div>
+""",unsafe_allow_html=True)
+```
+
 
 health_score = min(100, health_score)
 
