@@ -176,33 +176,93 @@ margin-top:20px;
 """,
 unsafe_allow_html=True
 )
-# ---------------------------------------------------
-# TARGET STATUS
-# ---------------------------------------------------
-status_df = pd.DataFrame({
-    "Metric": ["AUM", "SIP Book", "Clients", "Partners"],
-    "Current": [round(total_aum, 2), round(sip_book, 2), clients, partners],
-    "Target": [target_aum, target_sip, target_clients, target_partners]
-})
+# ============================================
+# CURRENT VS TARGET CARDS
+# ============================================
 
-plot_df = status_df.melt(
-    id_vars="Metric",
-    value_vars=["Current", "Target"],
-    var_name="Type",
-    value_name="Value"
-)
+st.subheader("🎯 Current vs Target")
 
-fig = px.bar(
-    plot_df,
-    x="Metric",
-    y="Value",
-    color="Type",
-    barmode="group",
-    text_auto=True,
-    title="Current vs Target"
-)
+aum_pct = min((total_aum/target_aum)*100,100)
+sip_pct = min((sip_book/target_sip)*100,100)
+client_pct = min((clients/target_clients)*100,100)
+partner_pct = min((partners/target_partners)*100,100)
 
-st.plotly_chart(fig, use_container_width=True)
+col1,col2 = st.columns(2)
+col3,col4 = st.columns(2)
+
+with col1:
+
+    st.markdown(f"""
+    <div style="
+    background:linear-gradient(135deg,#0f766e,#14b8a6);
+    padding:25px;
+    border-radius:25px;
+    box-shadow:0px 8px 25px rgba(20,184,166,.3);
+    ">
+    <h3 style='color:white'>💰 AUM</h3>
+    <h1 style='color:white'>₹{total_aum:.2f} Cr</h1>
+    <h4 style='color:white'>Target : ₹{target_aum} Cr</h4>
+    </div>
+    """,unsafe_allow_html=True)
+
+    st.progress(aum_pct/100)
+    st.write(f"{aum_pct:.1f}% Achieved")
+
+with col2:
+
+    st.markdown(f"""
+    <div style="
+    background:linear-gradient(135deg,#1d4ed8,#3b82f6);
+    padding:25px;
+    border-radius:25px;
+    box-shadow:0px 8px 25px rgba(59,130,246,.3);
+    ">
+    <h3 style='color:white'>📈 SIP Book</h3>
+    <h1 style='color:white'>₹{sip_book:.2f} Cr</h1>
+    <h4 style='color:white'>Target : ₹{target_sip} Cr</h4>
+    </div>
+    """,unsafe_allow_html=True)
+
+    st.progress(sip_pct/100)
+    st.write(f"{sip_pct:.1f}% Achieved")
+
+
+with col3:
+
+    st.markdown(f"""
+    <div style="
+    background:linear-gradient(135deg,#d97706,#f59e0b);
+    padding:25px;
+    border-radius:25px;
+    box-shadow:0px 8px 25px rgba(245,158,11,.3);
+    ">
+    <h3 style='color:white'>👥 Clients</h3>
+    <h1 style='color:white'>{clients}</h1>
+    <h4 style='color:white'>Target : {target_clients}</h4>
+    </div>
+    """,unsafe_allow_html=True)
+
+    st.progress(client_pct/100)
+    st.write(f"{client_pct:.1f}% Achieved")
+
+
+with col4:
+
+    st.markdown(f"""
+    <div style="
+    background:linear-gradient(135deg,#7c3aed,#9333ea);
+    padding:25px;
+    border-radius:25px;
+    box-shadow:0px 8px 25px rgba(147,51,234,.3);
+    ">
+    <h3 style='color:white'>🤝 Partners</h3>
+    <h1 style='color:white'>{partners}</h1>
+    <h4 style='color:white'>Target : {target_partners}</h4>
+    </div>
+    """,unsafe_allow_html=True)
+
+    st.progress(partner_pct/100)
+    st.write(f"{partner_pct:.1f}% Achieved")
 
 # ---------------------------------------------------
 # TOP PARTNERS
