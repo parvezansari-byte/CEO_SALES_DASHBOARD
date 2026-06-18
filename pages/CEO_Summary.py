@@ -48,7 +48,7 @@ target_sip = 2
 target_clients = 3500
 target_partners = 120
 
-```python
+
 # =====================================================
 # PREMIUM CEO KPI CARDS
 # =====================================================
@@ -134,13 +134,11 @@ with col4:
     <div class="card-value">{partners}</div>
     </div>
     """,unsafe_allow_html=True)
-```
 
 
 # ---------------------------------------------------
 # BUSINESS HEALTH SCORE
 # ---------------------------------------------------
-```python
 st.markdown(f"""
 <div style="
 background:linear-gradient(90deg,#065f46,#22c55e);
@@ -154,7 +152,6 @@ margin-top:15px;
 <h4 style='color:#dcfce7'>Moderate Growth</h4>
 </div>
 """,unsafe_allow_html=True)
-```
 
 
 health_score = min(100, health_score)
