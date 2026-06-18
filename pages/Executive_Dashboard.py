@@ -43,89 +43,69 @@ net_sales = df["Net Sales"].sum() if "Net Sales" in df.columns else 0
 
 st.markdown("""
 <style>
-
-.kpi-card{
+.card{
 padding:25px;
 border-radius:25px;
-box-shadow:0px 10px 25px rgba(0,0,0,.35);
-transition:.3s;
+box-shadow:0px 10px 25px rgba(0,0,0,.3);
 }
-
-.kpi-card:hover{
-transform:translateY(-5px);
-}
-
 .title{
+color:white;
 font-size:15px;
 font-weight:600;
-color:white;
 }
-
 .value{
-font-size:42px;
-font-weight:800;
 color:white;
-margin-top:10px;
+font-size:42px;
+font-weight:700;
 }
-
 </style>
 """,unsafe_allow_html=True)
 
-col1,col2,col3,col4,col5,col6 = st.columns(6)
+col1,col2,col3,col4 = st.columns(4)
 
 with col1:
-    st.markdown(f"""
-    <div class="kpi-card"
-    style="background:linear-gradient(135deg,#16a34a,#22c55e);">
-    <div class="title">💰 AUM</div>
-    <div class="value">₹{total_aum:.2f} Cr</div>
-    </div>
-    """,unsafe_allow_html=True)
+    st.markdown(
+        f"""
+        <div class="card" style="background:linear-gradient(135deg,#16a34a,#22c55e)">
+            <div class="title">💰 AUM</div>
+            <div class="value">₹{total_aum:.2f} Cr</div>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
 
 with col2:
-    st.markdown(f"""
-    <div class="kpi-card"
-    style="background:linear-gradient(135deg,#2563eb,#3b82f6);">
-    <div class="title">📈 SIP Book</div>
-    <div class="value">₹{sip_book:.2f} Cr</div>
-    </div>
-    """,unsafe_allow_html=True)
+    st.markdown(
+        f"""
+        <div class="card" style="background:linear-gradient(135deg,#2563eb,#3b82f6)">
+            <div class="title">📈 SIP Book</div>
+            <div class="value">₹{sip_book:.2f} Cr</div>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
 
 with col3:
-    st.markdown(f"""
-    <div class="kpi-card"
-    style="background:linear-gradient(135deg,#f59e0b,#d97706);">
-    <div class="title">👥 Clients</div>
-    <div class="value">{clients}</div>
-    </div>
-    """,unsafe_allow_html=True)
+    st.markdown(
+        f"""
+        <div class="card" style="background:linear-gradient(135deg,#f59e0b,#d97706)">
+            <div class="title">👥 Clients</div>
+            <div class="value">{clients}</div>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
 
 with col4:
-    st.markdown(f"""
-    <div class="kpi-card"
-    style="background:linear-gradient(135deg,#7c3aed,#9333ea);">
-    <div class="title">🤝 Partners</div>
-    <div class="value">{partners}</div>
-    </div>
-    """,unsafe_allow_html=True)
-
-with col5:
-    st.markdown("""
-    <div class="kpi-card"
-    style="background:linear-gradient(135deg,#dc2626,#ef4444);">
-    <div class="title">💹 Gross Sales</div>
-    <div class="value">₹0.00 Cr</div>
-    </div>
-    """,unsafe_allow_html=True)
-
-with col6:
-    st.markdown("""
-    <div class="kpi-card"
-    style="background:linear-gradient(135deg,#0891b2,#06b6d4);">
-    <div class="title">📊 Net Sales</div>
-    <div class="value">₹0.00 Cr</div>
-    </div>
-    """,unsafe_allow_html=True)
+    st.markdown(
+        f"""
+        <div class="card" style="background:linear-gradient(135deg,#7c3aed,#9333ea)">
+            <div class="title">🤝 Partners</div>
+            <div class="value">{partners}</div>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
 # ---------- TOP 10 PARTNERS ----------
 st.subheader("🏆 Top 10 Partners by AUM")
 
