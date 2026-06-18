@@ -1,0 +1,13 @@
+streamlit
+pandas
+numpy
+plotly
+openpyxl
+xlsxwriter
+reportlab
+matplotlib
+seaborn
+scikit-learn
+scipy
+fpdf2
+kaleido
