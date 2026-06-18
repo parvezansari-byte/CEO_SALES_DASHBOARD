@@ -37,29 +37,95 @@ partners = len(df)
 gross_sales = df["Gross Sales"].sum() if "Gross Sales" in df.columns else 0
 net_sales = df["Net Sales"].sum() if "Net Sales" in df.columns else 0
 
-# ---------- KPI CARDS ----------
-c1, c2, c3, c4, c5, c6 = st.columns(6)
+# =====================================================
+# PREMIUM KPI CARDS
+# =====================================================
 
-with c1:
-    st.metric("AUM", f"₹{total_aum/1e7:.2f} Cr")
+st.markdown("""
+<style>
 
-with c2:
-    st.metric("SIP Book", f"₹{total_sip/1e7:.2f} Cr")
+.kpi-card{
+padding:25px;
+border-radius:25px;
+box-shadow:0px 10px 25px rgba(0,0,0,.35);
+transition:.3s;
+}
 
-with c3:
-    st.metric("Clients", f"{int(total_clients)}")
+.kpi-card:hover{
+transform:translateY(-5px);
+}
 
-with c4:
-    st.metric("Partners", partners)
+.title{
+font-size:15px;
+font-weight:600;
+color:white;
+}
 
-with c5:
-    st.metric("Gross Sales", f"₹{gross_sales/1e7:.2f} Cr")
+.value{
+font-size:42px;
+font-weight:800;
+color:white;
+margin-top:10px;
+}
 
-with c6:
-    st.metric("Net Sales", f"₹{net_sales/1e7:.2f} Cr")
+</style>
+""",unsafe_allow_html=True)
 
-st.divider()
+col1,col2,col3,col4,col5,col6 = st.columns(6)
 
+with col1:
+    st.markdown(f"""
+    <div class="kpi-card"
+    style="background:linear-gradient(135deg,#16a34a,#22c55e);">
+    <div class="title">💰 AUM</div>
+    <div class="value">₹{total_aum:.2f} Cr</div>
+    </div>
+    """,unsafe_allow_html=True)
+
+with col2:
+    st.markdown(f"""
+    <div class="kpi-card"
+    style="background:linear-gradient(135deg,#2563eb,#3b82f6);">
+    <div class="title">📈 SIP Book</div>
+    <div class="value">₹{sip_book:.2f} Cr</div>
+    </div>
+    """,unsafe_allow_html=True)
+
+with col3:
+    st.markdown(f"""
+    <div class="kpi-card"
+    style="background:linear-gradient(135deg,#f59e0b,#d97706);">
+    <div class="title">👥 Clients</div>
+    <div class="value">{clients}</div>
+    </div>
+    """,unsafe_allow_html=True)
+
+with col4:
+    st.markdown(f"""
+    <div class="kpi-card"
+    style="background:linear-gradient(135deg,#7c3aed,#9333ea);">
+    <div class="title">🤝 Partners</div>
+    <div class="value">{partners}</div>
+    </div>
+    """,unsafe_allow_html=True)
+
+with col5:
+    st.markdown("""
+    <div class="kpi-card"
+    style="background:linear-gradient(135deg,#dc2626,#ef4444);">
+    <div class="title">💹 Gross Sales</div>
+    <div class="value">₹0.00 Cr</div>
+    </div>
+    """,unsafe_allow_html=True)
+
+with col6:
+    st.markdown("""
+    <div class="kpi-card"
+    style="background:linear-gradient(135deg,#0891b2,#06b6d4);">
+    <div class="title">📊 Net Sales</div>
+    <div class="value">₹0.00 Cr</div>
+    </div>
+    """,unsafe_allow_html=True)
 # ---------- TOP 10 PARTNERS ----------
 st.subheader("🏆 Top 10 Partners by AUM")
 
