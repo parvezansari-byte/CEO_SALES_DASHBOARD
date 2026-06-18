@@ -264,10 +264,13 @@ with col4:
     st.progress(partner_pct/100)
     st.write(f"{partner_pct:.1f}% Achieved")
 
-# ---------------------------------------------------
-# TOP PARTNERS
-# ---------------------------------------------------
-st.subheader("🏆 Top 10 Partners")
+# ==========================================================
+# TOP 10 PARTNERS SECTION
+# ==========================================================
+
+import plotly.express as px
+
+st.markdown("## 🏆 Top 10 Partners")
 
 top10 = (
     df.sort_values(
@@ -277,18 +280,169 @@ top10 = (
     .head(10)
 )
 
-st.dataframe(
-    top10[
-        [
-            "Agent Name",
-            "AUM (Eq+Hybrid)",
-            "SIP Book Value",
-            "No. of Clients"
-        ]
-    ],
+top10["AUM Cr"] = top10["AUM (Eq+Hybrid)"]/1e7
+
+# ==========================================================
+# TOP 10 HORIZONTAL BAR
+# ==========================================================
+
+fig = px.bar(
+    top10.sort_values("AUM Cr"),
+    x="AUM Cr",
+    y="Agent Name",
+    orientation="h",
+    color="AUM Cr",
+    text="AUM Cr",
+
+    color_continuous_scale=[
+        "#16a34a",
+        "#22c55e",
+        "#38bdf8",
+        "#2563eb",
+        "#7c3aed"
+    ]
+)
+
+fig.update_traces(
+    texttemplate="₹%{text:.2f} Cr",
+    textposition="outside"
+)
+
+fig.update_layout(
+
+    height=650,
+
+    paper_bgcolor="#020817",
+    plot_bgcolor="#020817",
+
+    font=dict(
+        color="white",
+        size=14
+    ),
+
+    xaxis_title="AUM (Cr)",
+
+    yaxis_title="",
+
+    coloraxis_showscale=False
+)
+
+st.plotly_chart(
+    fig,
     use_container_width=True
 )
 
+# ==========================================================
+# TOP 3 PARTNER CARDS
+# ==========================================================
+
+col1,col2,col3 = st.columns(3)
+
+# GOLD
+with col1:
+
+    st.markdown(f"""
+    <div style="
+    background:linear-gradient(135deg,#fbbf24,#f59e0b);
+    padding:25px;
+    border-radius:25px;
+    box-shadow:0px 8px 25px rgba(251,191,36,.3);
+    ">
+    <h3 style='color:white'>🥇 Gold Partner</h3>
+
+    <h2 style='color:white'>{top10.iloc[0]["Agent Name"]}</h2>
+
+    <h1 style='color:white'>₹{top10.iloc[0]["AUM Cr"]:.2f} Cr</h1>
+
+    <h4 style='color:white'>
+    Clients : {top10.iloc[0]["No. of Clients"]}
+    </h4>
+
+    </div>
+    """,
+    unsafe_allow_html=True)
+
+# SILVER
+with col2:
+
+    st.markdown(f"""
+    <div style="
+    background:linear-gradient(135deg,#94a3b8,#64748b);
+    padding:25px;
+    border-radius:25px;
+    box-shadow:0px 8px 25px rgba(148,163,184,.3);
+    ">
+    <h3 style='color:white'>🥈 Silver Partner</h3>
+
+    <h2 style='color:white'>{top10.iloc[1]["Agent Name"]}</h2>
+
+    <h1 style='color:white'>₹{top10.iloc[1]["AUM Cr"]:.2f} Cr</h1>
+
+    <h4 style='color:white'>
+    Clients : {top10.iloc[1]["No. of Clients"]}
+    </h4>
+
+    </div>
+    """,
+    unsafe_allow_html=True)
+
+# BRONZE
+with col3:
+
+    st.markdown(f"""
+    <div style="
+    background:linear-gradient(135deg,#b45309,#92400e);
+    padding:25px;
+    border-radius:25px;
+    box-shadow:0px 8px 25px rgba(180,83,9,.3);
+    ">
+    <h3 style='color:white'>🥉 Bronze Partner</h3>
+
+    <h2 style='color:white'>{top10.iloc[2]["Agent Name"]}</h2>
+
+    <h1 style='color:white'>₹{top10.iloc[2]["AUM Cr"]:.2f} Cr</h1>
+
+    <h4 style='color:white'>
+    Clients : {top10.iloc[2]["No. of Clients"]}
+    </h4>
+
+    </div>
+    """,
+    unsafe_allow_html=True)
+
+st.divider()
+
+# ==========================================================
+# TOP 10 CONTRIBUTION PIE CHART
+# ==========================================================
+
+st.subheader("📊 Top 10 AUM Contribution")
+
+fig2 = px.pie(
+    top10,
+    names="Agent Name",
+    values="AUM Cr",
+    hole=.6,
+
+    color_discrete_sequence=px.colors.sequential.Agsunset
+)
+
+fig2.update_layout(
+
+    height=600,
+
+    paper_bgcolor="#020817",
+    plot_bgcolor="#020817",
+
+    font=dict(
+        color="white"
+    )
+)
+
+st.plotly_chart(
+    fig2,
+    use_container_width=True
+)
 # ---------------------------------------------------
 # RISK MATRIX
 # ---------------------------------------------------
