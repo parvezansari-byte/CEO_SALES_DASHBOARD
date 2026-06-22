@@ -1,6 +1,72 @@
 import streamlit as st
 import pandas as pd
+st.markdown("""
+<style>
 
+/* Main Background */
+.stApp{
+background: linear-gradient(135deg,#020617,#0f172a,#111827);
+color:white;
+}
+
+/* Sidebar */
+[data-testid="stSidebar"]{
+background:linear-gradient(180deg,#111827,#1e293b);
+border-right:1px solid rgba(255,255,255,0.1);
+}
+
+/* Headers */
+h1{
+font-size:52px !important;
+font-weight:800 !important;
+color:white !important;
+}
+
+h2,h3{
+color:white !important;
+}
+
+/* Metric Cards */
+[data-testid="metric-container"]{
+background:rgba(255,255,255,0.05);
+border:1px solid rgba(255,255,255,0.1);
+padding:20px;
+border-radius:22px;
+box-shadow:0 8px 25px rgba(0,0,0,0.4);
+}
+
+/* Buttons */
+.stButton>button{
+background:linear-gradient(135deg,#2563eb,#7c3aed);
+color:white;
+border:none;
+border-radius:14px;
+font-weight:600;
+height:50px;
+width:100%;
+}
+
+/* File uploader */
+[data-testid="stFileUploader"]{
+background:rgba(255,255,255,0.05);
+padding:20px;
+border-radius:20px;
+border:1px solid rgba(255,255,255,0.1);
+}
+
+/* Dataframe */
+[data-testid="stDataFrame"]{
+border-radius:20px;
+overflow:hidden;
+}
+
+/* Success box */
+[data-baseweb="notification"]{
+border-radius:18px;
+}
+
+</style>
+""", unsafe_allow_html=True)
 # ==========================================================
 # PAGE CONFIG
 # ==========================================================
