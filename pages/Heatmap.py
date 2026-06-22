@@ -16,7 +16,11 @@ def load_data():
 
     return pd.read_excel(EXCEL_FILE)
 
-df = load_data()
+df = st.session_state.get("df")
+
+if df is None:
+    st.warning("Please upload an Excel file.")
+    st.stop()
 
 st.title("🔥 Heatmap Analysis")
 
