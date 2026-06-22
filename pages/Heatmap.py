@@ -103,25 +103,65 @@ styled_df = (
 
 st.dataframe(styled_df, use_container_width=True)
 
-# ------------------------------------
+# =========================================================
 # ZONE DISTRIBUTION
-# ------------------------------------
+# =========================================================
+import pandas as pd
+import plotly.express as px
+import streamlit as st
+
 st.subheader("Zone Distribution")
 
-zone_summary = (
-    df.groupby("Zone")
-    .size()
-    .reset_index(name="Partners")
-)
+try:
 
-fig1 = px.pie(
-    zone_summary,
-    names="Zone",
-    values="Partners",
-    hole=0.5
-)
+    # Create zone dataframe
+    zone_df = (
+        df.groupby("Zone")["AUM"]
+        .sum()
+        .reset_index()
+    )
 
-st.plotly_chart(fig1, use_container_width=True)
+    # Remove null values
+    zone_df = zone_df.dropna()
+
+    # Check if dataframe is empty
+    if zone_df.empty:
+        st.warning("No Zone data available.")
+
+    else:
+
+        fig1 = px.pie(
+            zone_df,
+            names="Zone",
+            values="AUM",
+            hole=0.55,
+            color_discrete_sequence=px.colors.qualitative.Set3
+        )
+
+        fig1.update_traces(
+            textposition="inside",
+            textinfo="percent+label"
+        )
+
+        fig1.update_layout(
+            height=500,
+            paper_bgcolor="rgba(0,0,0,0)",
+            plot_bgcolor="rgba(0,0,0,0)",
+            font=dict(color="white", size=14),
+            showlegend=True,
+            legend_title="Zone"
+        )
+
+        st.plotly_chart(fig1, use_container_width=True)
+
+except KeyError as e:
+    st.error(f"Column not found: {e}")
+    st.write("Available columns:")
+    st.write(df.columns)
+
+except Exception as e:
+    st.error(f"Error creating Zone Distribution chart")
+    st.exception(e)
 
 # ------------------------------------
 # TOP 10 PARTNERS
