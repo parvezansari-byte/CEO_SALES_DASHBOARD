@@ -1,104 +1,130 @@
+# ==========================================================
+# MONTHLY SUMMARY - DYNAMIC VERSION
+# ==========================================================
 import streamlit as st
 import pandas as pd
-import plotly.express as px
+from pathlib import Path
 
-st.set_page_config(layout="wide")
+# ----------------------------------------------------------
+# LOAD DATA
+# ----------------------------------------------------------
+@st.cache_data(ttl=0)
+def load_data():
 
-st.title("📈 Monthly Trends Dashboard")
+    BASE_DIR = Path(__file__).resolve().parent.parent
+    EXCEL_FILE = BASE_DIR / "sales_analysis_report.xlsx"
 
-# --------------------
-# Monthly Data
-# --------------------
-trend_df = pd.DataFrame({
-    "Month": ["Jan-26","Feb-26","Mar-26","Apr-26","May-26","Jun-26"],
-    "Gross Sales":[1.20,1.45,1.80,0.85,1.55,1.35],
-    "Net Sales":[0.75,1.05,1.35,-3.93,2.57,0.89],
-    "SIP Sales":[3.2,3.5,4.1,3.8,4.0,4.52],
-    "Redemption":[0.45,0.40,0.45,4.78,-1.02,0.46]
-})
+    try:
+        df = pd.read_excel(EXCEL_FILE)
+        return df
 
-# --------------------
-# KPI Cards
-# --------------------
-c1,c2,c3,c4=st.columns(4)
+    except Exception as e:
+        st.error(f"Error loading file : {e}")
+        return pd.DataFrame()
 
-with c1:
-    st.metric("Latest Gross Sales","₹1.35 Cr")
+# Refresh button
+col1, col2 = st.columns([1,5])
 
-with c2:
-    st.metric("Latest Net Sales","₹89 L")
+with col1:
+    if st.button("🔄 Refresh Data"):
+        st.cache_data.clear()
+        st.rerun()
 
-with c3:
-    st.metric("Latest SIP Sales","₹4.52 L")
+# Load latest data
+df = load_data()
 
-with c4:
-    st.metric("Monthly Growth","+12.4 %")
+# ----------------------------------------------------------
+# REQUIRED COLUMNS CHECK
+# ----------------------------------------------------------
+required_cols = [
+    "Month",
+    "Gross Sales",
+    "Net Sales",
+    "SIP Sales",
+    "Redemption"
+]
 
-st.divider()
+missing_cols = [col for col in required_cols if col not in df.columns]
 
-# --------------------
-# Gross Sales Trend
-# --------------------
-st.subheader("Gross Sales Trend")
+if missing_cols:
+    st.error(f"Missing columns: {missing_cols}")
+    st.write("Available columns:")
+    st.write(df.columns.tolist())
+    st.stop()
 
-fig1=px.area(
-    trend_df,
-    x="Month",
-    y="Gross Sales",
-    markers=True
+# ----------------------------------------------------------
+# CONVERT NUMERIC COLUMNS
+# ----------------------------------------------------------
+for col in [
+    "Gross Sales",
+    "Net Sales",
+    "SIP Sales",
+    "Redemption"
+]:
+    df[col] = pd.to_numeric(df[col], errors="coerce").fillna(0)
+
+# ----------------------------------------------------------
+# MONTHLY SUMMARY
+# ----------------------------------------------------------
+monthly_summary = (
+    df.groupby("Month", as_index=False)
+      .agg({
+          "Gross Sales":"sum",
+          "Net Sales":"sum",
+          "SIP Sales":"sum",
+          "Redemption":"sum"
+      })
 )
 
-st.plotly_chart(fig1,use_container_width=True)
+# ----------------------------------------------------------
+# SORT MONTHS
+# ----------------------------------------------------------
+try:
+    monthly_summary["SortMonth"] = pd.to_datetime(
+        monthly_summary["Month"],
+        format="%b-%y"
+    )
 
-# --------------------
-# Net Sales Trend
-# --------------------
-st.subheader("Net Sales Trend")
+    monthly_summary = (
+        monthly_summary
+        .sort_values("SortMonth")
+        .drop(columns="SortMonth")
+    )
 
-fig2=px.line(
-    trend_df,
-    x="Month",
-    y="Net Sales",
-    markers=True
-)
+except:
+    pass
 
-st.plotly_chart(fig2,use_container_width=True)
+# ----------------------------------------------------------
+# ROUND VALUES
+# ----------------------------------------------------------
+monthly_summary[
+    ["Gross Sales","Net Sales","SIP Sales","Redemption"]
+] = monthly_summary[
+    ["Gross Sales","Net Sales","SIP Sales","Redemption"]
+].round(2)
 
-# --------------------
-# SIP Sales Trend
-# --------------------
-st.subheader("SIP Sales Trend")
+# ----------------------------------------------------------
+# TITLE
+# ----------------------------------------------------------
+st.subheader("📅 Monthly Summary")
 
-fig3=px.bar(
-    trend_df,
-    x="Month",
-    y="SIP Sales",
-    color="SIP Sales",
-    text_auto=True
-)
-
-st.plotly_chart(fig3,use_container_width=True)
-
-# --------------------
-# Redemption Trend
-# --------------------
-st.subheader("Redemption Trend")
-
-fig4=px.line(
-    trend_df,
-    x="Month",
-    y="Redemption",
-    markers=True
-)
-
-st.plotly_chart(fig4,use_container_width=True)
-
-# --------------------
-# Monthly Table
-# --------------------
-st.subheader("Monthly Summary")
-
+# ----------------------------------------------------------
+# TABLE
+# ----------------------------------------------------------
 st.dataframe(
-    trend_df,
-    use_container_width=True
+    monthly_summary,
+    use_container_width=True,
+    hide_index=True
+)
+
+# ----------------------------------------------------------
+# DOWNLOAD
+# ----------------------------------------------------------
+csv = monthly_summary.to_csv(index=False)
+
+st.download_button(
+    "⬇ Download Monthly Summary",
+    csv,
+    "monthly_summary.csv",
+    "text/csv"
 )
