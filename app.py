@@ -103,6 +103,20 @@ st.markdown("### Upload Excel File For Analysis")
 # ==========================================================
 # FILE UPLOAD
 # ==========================================================
+st.markdown("""
+<div style="
+background:rgba(255,255,255,0.05);
+padding:30px;
+border-radius:25px;
+border:1px solid rgba(255,255,255,0.1);
+margin-top:20px;
+">
+
+<h3>📂 Upload Excel File</h3>
+<p>Upload Sales Report For Complete Analysis</p>
+
+</div>
+""", unsafe_allow_html=True)
 uploaded_file = st.file_uploader(
     "📂 Upload Excel File",
     type=["xlsx", "xls"]
