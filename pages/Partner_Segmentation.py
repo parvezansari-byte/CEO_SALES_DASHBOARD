@@ -22,7 +22,11 @@ def load_data():
         st.error(f"Unable to load Excel file: {e}")
         return pd.DataFrame()
 
-df = load_data()
+df = st.session_state.get("df")
+
+if df is None:
+    st.warning("Please upload an Excel file.")
+    st.stop()
 
 st.title("🎯 Partner Segmentation")
 
