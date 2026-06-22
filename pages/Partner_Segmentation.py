@@ -1,27 +1,54 @@
 import streamlit as st
 import pandas as pd
+import plotly.express as px
 from pathlib import Path
 
-# ----------------------------------------
+# =====================================================
+# PAGE CONFIG
+# =====================================================
+st.set_page_config(page_title="Partner Segmentation", layout="wide")
+
+# =====================================================
 # LOAD DATA
-# ----------------------------------------
+# =====================================================
 @st.cache_data
 def load_data():
-
-    # Root folder of project
     BASE_DIR = Path(__file__).resolve().parent.parent
-
-    # Excel file path
     EXCEL_FILE = BASE_DIR / "sales_analysis_report.xlsx"
 
-    return pd.read_excel(EXCEL_FILE)
+    try:
+        return pd.read_excel(EXCEL_FILE)
+    except Exception as e:
+        st.error(f"Unable to load Excel file: {e}")
+        return pd.DataFrame()
 
 df = load_data()
+
 st.title("🎯 Partner Segmentation")
 
-# ----------------------------------
+if df.empty:
+    st.stop()
+
+# =====================================================
+# CHECK REQUIRED COLUMNS
+# =====================================================
+required_cols = [
+    "Agent Name",
+    "AUM (Eq+Hybrid)",
+    "SIP Book Value",
+    "No. of Clients"
+]
+
+missing_cols = [col for col in required_cols if col not in df.columns]
+
+if missing_cols:
+    st.error(f"Missing columns: {missing_cols}")
+    st.write(df.columns.tolist())
+    st.stop()
+
+# =====================================================
 # SEGMENT FUNCTION
-# ----------------------------------
+# =====================================================
 def segment(aum):
 
     if aum >= 5e7:
@@ -36,12 +63,11 @@ def segment(aum):
     else:
         return "Dormant"
 
+df["Segment"] = df["AUM (Eq+Hybrid)"].fillna(0).apply(segment)
 
-df["Segment"] = df["AUM (Eq+Hybrid)"].apply(segment)
-
-# ----------------------------------
+# =====================================================
 # SUMMARY
-# ----------------------------------
+# =====================================================
 summary = (
     df.groupby("Segment")
     .agg(
@@ -53,65 +79,86 @@ summary = (
     .reset_index()
 )
 
-# ----------------------------------
+# =====================================================
 # KPI CARDS
-# ----------------------------------
+# =====================================================
+st.subheader("Partner Categories")
+
 c1, c2, c3, c4 = st.columns(4)
 
-elite_count = (df["Segment"]=="Elite").sum()
-growth_count = (df["Segment"]=="Growth").sum()
-emerging_count = (df["Segment"]=="Emerging").sum()
-dormant_count = (df["Segment"]=="Dormant").sum()
-
-c1.metric("Elite", elite_count)
-c2.metric("Growth", growth_count)
-c3.metric("Emerging", emerging_count)
-c4.metric("Dormant", dormant_count)
+c1.metric("Elite", (df["Segment"]=="Elite").sum())
+c2.metric("Growth", (df["Segment"]=="Growth").sum())
+c3.metric("Emerging", (df["Segment"]=="Emerging").sum())
+c4.metric("Dormant", (df["Segment"]=="Dormant").sum())
 
 st.divider()
 
-# ----------------------------------
+# =====================================================
 # PIE CHART
-# ----------------------------------
+# =====================================================
 st.subheader("Partner Distribution")
 
-fig1 = px.pie(
-    summary,
-    names="Segment",
-    values="Partners",
-    hole=0.5
-)
+try:
+    fig1 = px.pie(
+        summary,
+        names="Segment",
+        values="Partners",
+        hole=0.55,
+        color="Segment"
+    )
 
-st.plotly_chart(fig1, use_container_width=True)
+    fig1.update_traces(
+        textposition="inside",
+        textinfo="percent+label"
+    )
 
-# ----------------------------------
-# AUM DISTRIBUTION
-# ----------------------------------
+    fig1.update_layout(
+        height=500,
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)"
+    )
+
+    st.plotly_chart(fig1, use_container_width=True)
+
+except Exception as e:
+    st.error(e)
+
+# =====================================================
+# AUM CHART
+# =====================================================
 st.subheader("Segment Wise AUM")
 
-fig2 = px.bar(
-    summary,
-    x="Segment",
-    y="Total_AUM",
-    color="Segment",
-    text_auto=".2s"
-)
+try:
 
-st.plotly_chart(fig2, use_container_width=True)
+    fig2 = px.bar(
+        summary,
+        x="Segment",
+        y="Total_AUM",
+        color="Segment",
+        text_auto=".2s"
+    )
 
-# ----------------------------------
-# TABLE
-# ----------------------------------
+    fig2.update_layout(
+        height=500,
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)"
+    )
+
+    st.plotly_chart(fig2, use_container_width=True)
+
+except Exception as e:
+    st.error(e)
+
+# =====================================================
+# SUMMARY TABLE
+# =====================================================
 st.subheader("Segment Summary")
 
-st.dataframe(
-    summary,
-    use_container_width=True
-)
+st.dataframe(summary, use_container_width=True)
 
-# ----------------------------------
+# =====================================================
 # FILTER
-# ----------------------------------
+# =====================================================
 selected_segment = st.selectbox(
     "Select Segment",
     ["Elite", "Growth", "Emerging", "Dormant"]
@@ -119,6 +166,9 @@ selected_segment = st.selectbox(
 
 filtered_df = df[df["Segment"] == selected_segment]
 
+# =====================================================
+# PARTNER TABLE
+# =====================================================
 st.subheader(f"{selected_segment} Partners")
 
 cols = [
@@ -133,53 +183,53 @@ st.dataframe(
     use_container_width=True
 )
 
-# ----------------------------------
-# OPPORTUNITY ANALYSIS
-# ----------------------------------
+# =====================================================
+# AI OPPORTUNITY ANALYSIS
+# =====================================================
 st.subheader("AI Opportunity Analysis")
 
 if selected_segment == "Elite":
 
     st.success("""
-    ✓ Focus on HNI clients
+✅ Focus on HNI clients
 
-    ✓ PMS opportunities
+✅ PMS opportunities
 
-    ✓ Target ₹15 Cr incremental AUM
+✅ Target ₹15 Cr incremental AUM
 
-    ✓ Family account mapping
-    """)
+✅ Family account mapping
+""")
 
 elif selected_segment == "Growth":
 
     st.info("""
-    ✓ Double AUM in 12 months
+✅ Double AUM in 12 months
 
-    ✓ Monthly SIP campaigns
+✅ Monthly SIP campaigns
 
-    ✓ Child education planning
+✅ Goal-based investments
 
-    ✓ Goal-based investments
-    """)
+✅ Child education planning
+""")
 
 elif selected_segment == "Emerging":
 
     st.warning("""
-    ✓ Activate 5 SIPs/month
+✅ Activate 5 SIPs/month
 
-    ✓ Lead generation support
+✅ Lead generation support
 
-    ✓ Monthly training sessions
-    """)
+✅ Monthly training sessions
+""")
 
 else:
 
     st.error("""
-    ✓ Dormant partner activation
+✅ Dormant partner activation
 
-    ✓ Reactivation campaign
+✅ Reactivation campaign
 
-    ✓ Webinar support
+✅ Webinar support
 
-    ✓ Monthly engagement calls
-    """)
+✅ Monthly engagement calls
+""")
