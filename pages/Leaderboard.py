@@ -1,28 +1,50 @@
 import streamlit as st
 import pandas as pd
+import plotly.express as px
 from pathlib import Path
 
-# ----------------------------------------
+# ========================================
 # LOAD DATA
-# ----------------------------------------
+# ========================================
 @st.cache_data
 def load_data():
-
-    # Root folder of project
     BASE_DIR = Path(__file__).resolve().parent.parent
-
-    # Excel file path
     EXCEL_FILE = BASE_DIR / "sales_analysis_report.xlsx"
 
-    return pd.read_excel(EXCEL_FILE)
+    try:
+        return pd.read_excel(EXCEL_FILE)
+    except Exception as e:
+        st.error(f"Unable to load Excel file: {e}")
+        return pd.DataFrame()
 
 df = load_data()
 
 st.title("🏆 Partner Leaderboard")
 
-# -------------------------
-# FILTER
-# -------------------------
+if df.empty:
+    st.stop()
+
+# ========================================
+# REQUIRED COLUMNS CHECK
+# ========================================
+required_cols = [
+    "Agent Name",
+    "AUM (Eq+Hybrid)",
+    "SIP Book Value",
+    "No. of Clients"
+]
+
+missing_cols = [col for col in required_cols if col not in df.columns]
+
+if missing_cols:
+    st.error(f"Missing columns: {missing_cols}")
+    st.write("Available columns:")
+    st.write(df.columns.tolist())
+    st.stop()
+
+# ========================================
+# FILTERS
+# ========================================
 metric = st.selectbox(
     "Rank Partners By",
     [
@@ -34,63 +56,76 @@ metric = st.selectbox(
 
 top_n = st.slider(
     "Top Partners",
-    5,
-    25,
-    10
+    min_value=5,
+    max_value=25,
+    value=10
 )
 
 search_partner = st.text_input("🔍 Search Partner")
 
-# -------------------------
+# ========================================
 # SEARCH
-# -------------------------
+# ========================================
 if search_partner:
     df = df[
         df["Agent Name"]
-        .str.contains(search_partner, case=False)
+        .astype(str)
+        .str.contains(search_partner, case=False, na=False)
     ]
 
-# -------------------------
-# TOP N
-# -------------------------
+# ========================================
+# TOP N DATA
+# ========================================
 leaderboard = (
     df.sort_values(metric, ascending=False)
       .head(top_n)
+      .copy()
 )
 
-# -------------------------
-# CHART
-# -------------------------
+# ========================================
+# BAR CHART
+# ========================================
 st.subheader(f"Top {top_n} Partners by {metric}")
 
-fig = px.bar(
-    leaderboard,
-    x="Agent Name",
-    y=metric,
-    color=metric,
-    text_auto=".2s"
-)
+try:
+    fig = px.bar(
+        leaderboard,
+        x="Agent Name",
+        y=metric,
+        color=metric,
+        text_auto=".2s"
+    )
 
-fig.update_layout(height=550)
+    fig.update_layout(
+        height=550,
+        xaxis_title="Partner",
+        yaxis_title=metric,
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)"
+    )
 
-st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, use_container_width=True)
 
-# -------------------------
-# STAR PARTNER SCORE
-# -------------------------
-leaderboard["Rank"] = range(1, len(leaderboard)+1)
+except Exception as e:
+    st.error(f"Chart Error: {e}")
+
+# ========================================
+# STAR RANK
+# ========================================
+leaderboard["Rank"] = range(1, len(leaderboard) + 1)
 
 leaderboard["Star"] = [
-    "⭐⭐⭐⭐⭐" if x <= 3
-    else "⭐⭐⭐⭐"
-    if x <= 7
-    else "⭐⭐⭐"
+    "⭐⭐⭐⭐⭐" if x <= 3 else
+    "⭐⭐⭐⭐" if x <= 7 else
+    "⭐⭐⭐"
     for x in leaderboard["Rank"]
 ]
 
-# -------------------------
+# ========================================
 # TABLE
-# -------------------------
+# ========================================
+st.subheader("📋 Leaderboard")
+
 show_cols = [
     "Rank",
     "Star",
@@ -100,37 +135,41 @@ show_cols = [
     "No. of Clients"
 ]
 
-st.subheader("📋 Leaderboard")
-
 st.dataframe(
     leaderboard[show_cols],
     use_container_width=True
 )
 
-# -------------------------
+# ========================================
 # DOWNLOAD
-# -------------------------
+# ========================================
 csv = leaderboard.to_csv(index=False)
 
 st.download_button(
     "⬇ Download Leaderboard",
-    csv,
-    "leaderboard.csv",
-    "text/csv"
+    data=csv,
+    file_name="leaderboard.csv",
+    mime="text/csv"
 )
 
-# -------------------------
-# TOP 5 PIE
-# -------------------------
+# ========================================
+# PIE CHART
+# ========================================
 st.subheader("Top 5 Contribution")
 
 top5 = leaderboard.head(5)
 
-fig2 = px.pie(
-    top5,
-    names="Agent Name",
-    values=metric,
-    hole=0.5
-)
+try:
+    fig2 = px.pie(
+        top5,
+        names="Agent Name",
+        values=metric,
+        hole=0.55
+    )
 
-st.plotly_chart(fig2, use_container_width=True)
+    fig2.update_layout(height=500)
+
+    st.plotly_chart(fig2, use_container_width=True)
+
+except Exception as e:
+    st.error(f"Pie Chart Error: {e}")
