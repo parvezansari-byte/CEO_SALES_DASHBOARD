@@ -15,13 +15,13 @@ st.set_page_config(
 # ==================================================
 st.title("📊 CEO Sales Dashboard")
 
-# ==================================================
-# SIDEBAR
-# ==================================================
-st.sidebar.title("📂 Data Upload")
+st.markdown("### Upload Excel File For Analysis")
 
-uploaded_file = st.sidebar.file_uploader(
-    "Upload Excel File",
+# ==================================================
+# FILE UPLOAD
+# ==================================================
+uploaded_file = st.file_uploader(
+    "Choose Excel File",
     type=["xlsx", "xls"]
 )
 
@@ -30,35 +30,35 @@ uploaded_file = st.sidebar.file_uploader(
 # ==================================================
 @st.cache_data
 def load_data(file):
-    try:
-        if file is not None:
-            return pd.read_excel(file)
-        else:
-            return pd.read_excel("sales_analysis_report.xlsx")
-    except:
-        return pd.DataFrame()
-
-# Load dataframe
-df = load_data(uploaded_file)
-
-# Store globally
-st.session_state["df"] = df
+    return pd.read_excel(file)
 
 # ==================================================
-# FILE STATUS
+# PROCESS FILE
 # ==================================================
 if uploaded_file is not None:
 
-    st.sidebar.success("✅ File Uploaded")
+    df = load_data(uploaded_file)
 
-    st.sidebar.write("Rows :", len(df))
-    st.sidebar.write("Columns :", len(df.columns))
+    # Save globally for all pages
+    st.session_state["df"] = df
+
+    st.success("✅ File Uploaded Successfully")
+
+    col1, col2 = st.columns(2)
+
+    col1.metric("Rows", len(df))
+    col2.metric("Columns", len(df.columns))
+
+    st.subheader("Preview")
+
+    st.dataframe(
+        df.head(),
+        use_container_width=True
+    )
 
 else:
 
-    st.sidebar.info(
-        "No file uploaded.\nUsing sales_analysis_report.xlsx"
-    )
+    st.info("⬆ Upload an Excel file to begin analysis.")
 
 # ==================================================
 # HOME PAGE
@@ -66,36 +66,14 @@ else:
 st.markdown("---")
 
 st.markdown("""
-# Welcome
-
-### Use the left sidebar to navigate:
+### Dashboard Modules
 
 - 📈 Executive Dashboard
-- 📅 Monthly Trend
-- 🏆 Leaderboard
-- 🎯 Partner Segmentation
 - 🔥 Heatmap
+- 🏆 Leaderboard
+- 📅 Monthly Trend
+- 🎯 Partner Segmentation
 - 📌 Target Tracker
 - 🤖 AI Recommendation
 - 👔 CEO Summary
-
----
 """)
-
-# ==================================================
-# DATA PREVIEW
-# ==================================================
-if not df.empty:
-
-    st.subheader("📋 Data Preview")
-
-    st.dataframe(
-        df.head(10),
-        use_container_width=True
-    )
-
-    st.success("Dashboard Ready ✅")
-
-else:
-
-    st.warning("Please upload an Excel file.")
