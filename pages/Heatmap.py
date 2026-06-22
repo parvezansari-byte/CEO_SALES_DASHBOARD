@@ -106,63 +106,48 @@ st.dataframe(styled_df, use_container_width=True)
 # =========================================================
 # ZONE DISTRIBUTION
 # =========================================================
-import pandas as pd
 import plotly.express as px
-import streamlit as st
 
 st.subheader("Zone Distribution")
 
 try:
 
-    # Create zone dataframe
-    zone_df = (
-        df.groupby("Zone")["AUM"]
-        .sum()
-        .reset_index()
-    )
+    # Show columns (remove later)
+    st.write("Columns:", list(df.columns))
 
-    # Remove null values
-    zone_df = zone_df.dropna()
+    # Find numeric columns
+    numeric_cols = df.select_dtypes(include='number').columns.tolist()
 
-    # Check if dataframe is empty
-    if zone_df.empty:
-        st.warning("No Zone data available.")
-
+    if len(numeric_cols) == 0:
+        st.error("No numeric columns found.")
     else:
+        value_col = numeric_cols[0]  # First numeric column
+
+        zone_df = (
+            df.groupby("Zone")[value_col]
+            .sum()
+            .reset_index()
+        )
 
         fig1 = px.pie(
             zone_df,
             names="Zone",
-            values="AUM",
-            hole=0.55,
+            values=value_col,
+            hole=0.5,
             color_discrete_sequence=px.colors.qualitative.Set3
-        )
-
-        fig1.update_traces(
-            textposition="inside",
-            textinfo="percent+label"
         )
 
         fig1.update_layout(
             height=500,
             paper_bgcolor="rgba(0,0,0,0)",
             plot_bgcolor="rgba(0,0,0,0)",
-            font=dict(color="white", size=14),
-            showlegend=True,
-            legend_title="Zone"
+            font=dict(color="white")
         )
 
         st.plotly_chart(fig1, use_container_width=True)
 
-except KeyError as e:
-    st.error(f"Column not found: {e}")
-    st.write("Available columns:")
-    st.write(df.columns)
-
 except Exception as e:
-    st.error(f"Error creating Zone Distribution chart")
-    st.exception(e)
-
+    st.error(e)
 # ------------------------------------
 # TOP 10 PARTNERS
 # ------------------------------------
