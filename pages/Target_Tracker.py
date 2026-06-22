@@ -28,7 +28,11 @@ def load_data():
         st.error(f"Error loading Excel file : {e}")
         return pd.DataFrame()
 
-df = load_data()
+df = st.session_state.get("df")
+
+if df is None:
+    st.warning("Please upload an Excel file.")
+    st.stop()
 
 if df.empty:
     st.stop()
