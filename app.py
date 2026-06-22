@@ -79,7 +79,25 @@ st.set_page_config(
 # ==========================================================
 # TITLE
 # ==========================================================
-st.title("📊 CEO Sales Dashboard")
+st.markdown("""
+<div style="
+background:linear-gradient(135deg,#2563eb,#7c3aed);
+padding:30px;
+border-radius:25px;
+text-align:center;
+box-shadow:0 15px 40px rgba(0,0,0,0.4);
+">
+
+<h1 style="color:white;">
+📊 CEO SALES DASHBOARD
+</h1>
+
+<h4 style="color:#E5E7EB;">
+AI Powered Wealth Analytics Platform
+</h4>
+
+</div>
+""", unsafe_allow_html=True)
 st.markdown("### Upload Excel File For Analysis")
 
 # ==========================================================
