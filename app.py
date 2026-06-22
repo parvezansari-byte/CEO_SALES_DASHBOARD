@@ -5,10 +5,10 @@ import pandas as pd
 # PAGE CONFIG
 # ======================================================
 st.set_page_config(
-    page_title="CEO Sales Dashboard",
+    page_title="Sales Dashboard",
     page_icon="📊",
     layout="wide"
-)
+) 
 
 # ======================================================
 # PREMIUM CSS
